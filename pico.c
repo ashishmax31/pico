@@ -5,6 +5,7 @@
 #include <netdb.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include "tokenizer.h"
 
 #define MAX_DATA 200
 #define MAX_ROW  110000
@@ -142,6 +143,10 @@ int main(int argc, char const *argv[])
 
   int listen_fd, comm_fd;
   char str[100];
+  char *tokens = malloc(sizeof(char) * 100);
+  char *args   = malloc(sizeof(char) * 100);
+  char *line   = malloc(sizeof(char) * 100);
+  int token_count;
   
   // Struct to hold IP Address and Port Numbers
   struct sockaddr_in servaddr;
@@ -192,13 +197,19 @@ int main(int argc, char const *argv[])
         comm_fd = accept(listen_fd, (struct sockaddr*) NULL, NULL);
       }
       printf("Echoing back - %s \n",str);
+      token_count = tokenize(line, tokens);
+      printf("%d\n",token_count);
+      for(int j = 0; j < token_count; j++){
+        printf("%s\n",tokens[j]);
+        args[j]                 = tokens[j]; 
+      }
     } 
     printf("%d\n",comm_fd);
     bzero(str, 100);
   }   
 
-  char *filename          = argv[1];
-  char action             = argv[2][0];
+  char *filename          = args[0];
+  char action             = argv[1];
   struct Connection *conn = Database_open(filename, action);
   int id = 0;
   
@@ -209,14 +220,14 @@ int main(int argc, char const *argv[])
       Database_write(conn);
       break;
     case 'g':
-      id = atoi(argv[3]);
+      id = atoi(args[2]);
       if(argc != 4) die("Need and id to get");
       Database_get(conn, id);
       break;
     case 's':
-      id = atoi(argv[3]);
+      id = atoi(args[2]);
       if(argc !=6) die("need id, name, email to set");
-      Database_set(conn, id, argv[4], argv[5]);
+      Database_set(conn, id, args[3], args[4]);
       Database_write(conn);
       break;
     case 'l':
