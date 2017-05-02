@@ -5,10 +5,10 @@
 
 /*
  * Function to return the array of tokens in a string delimited by space
- * @param   {char*, char**} String to be split, token's array 
+ * @param   {char*, char**} String to be split, token's array
  * @return  {int} number of tokens
  *
- * Example Snippet: 
+ * Example Snippet:
  *  char* line ="act bat cat dog";
  *  char* tokens[10];
  *  int number_of_tokens = parseString(line, tokens);
@@ -18,15 +18,15 @@
  *
  */
 int tokenize(char* line, char* tokens[]){
-  // Split the string into an array of strings 
+  // Split the string into an array of strings
   // String = array of chars -> char*, char[]
   // Array of strings = array of array of chars = char**, char[][]
-  // using strtok to tokenize 
+  // using strtok to tokenize
   // strtok(string, delimiter)
   char* buffer;
   int token_count = 0;
   char* temp_token;
-  buffer = (char*) malloc(strlen(line) * sizeof(char));
+  buffer = (char*) malloc((strlen(line) + 1)  * sizeof(char));
   strcpy(buffer, line);
   temp_token = strtok(buffer, DELIMITER);
   tokens[token_count] = temp_token;

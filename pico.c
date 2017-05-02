@@ -137,15 +137,24 @@ void Database_find(struct Connection *conn, char *name){
   }
 }
 
+
 int main(int argc, char const *argv[])
 {
   // File Descriptors to be used
 
   int listen_fd, comm_fd;
   char str[100];
-  char **tokens = malloc(sizeof(char) * 100);
-  char **args   = malloc(sizeof(char) * 100);
-  char *line   = malloc(sizeof(char) * 100);
+  char **tokens = NULL;
+  char **args   = NULL;
+  char *line    = NULL;
+  tokens        = (char **)(malloc(sizeof(char *) * 10));
+  args          = (char **)(malloc(sizeof(char *) * 10));
+  line          = (char * )(malloc(sizeof(char) * 101));
+
+  for(int i = 0; i<10; ++i){
+    tokens[i] = (char *) malloc(sizeof(char) *101);
+    args[i]   = (char *) malloc(sizeof(char) *101);
+  }
   int token_count;
 
   // Struct to hold IP Address and Port Numbers
@@ -202,7 +211,8 @@ int main(int argc, char const *argv[])
       // printf("%d\n",token_count);
       for(int j = 0; j < token_count; j++){
         // printf("%s\n",*(tokens + j));
-        *(args + j) = *(tokens +j);
+        // *(args + j) = *(tokens +j);
+         strcpy(args[j],tokens[j]);
         // printf("%s\n",*(args + j));
       }
     }
