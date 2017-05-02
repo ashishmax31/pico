@@ -27,6 +27,7 @@ int main(int argc,char **argv)
         bzero(sendline, 100);
         fgets(sendline,100,stdin); /*stdin = 0 , for standard input */
         write(sockfd,sendline,strlen(sendline)+1);
+        if (read(sockfd,recvline,100) > 0) printf("%s\n",recvline);
         if (strcmp(sendline,"quit\n\0") == 0){
             printf("exiting\n");
             shutdown(sockfd, SHUT_WR);
