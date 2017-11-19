@@ -137,8 +137,65 @@ void Database_find(struct Connection *conn,const char *name){
 }
 
 int main(int argc, char const *argv[])
-{
-  if(argc < 3) die("USAGE: sql <dbfile> <action> [action params]");
+{  
+  // File Descriptors to be used
+
+  int listen_fd, comm_fd;
+  char str[100];
+  
+  // Struct to hold IP Address and Port Numbers
+  struct sockaddr_in servaddr;
+  
+  // Each server needs to “listen” for connections. The above function creates a socket with AF_UNIX ( local unix port )
+  // and of type SOCK_STREAM. Data from all devices wishing to connect on this socket will be redirected to listen_fd.
+  printf("hi\n");
+  listen_fd = socket(AF_INET, SOCK_STREAM, 0);
+
+  // Clear servaddr ( Mandatory ).
+  bzero(&servaddr, sizeof(servaddr));
+
+  // Set Addressing scheme to – AF_UNIX ( LOCAL )
+  servaddr.sin_family = AF_INET;
+
+  // Allow any IP to connect – htons(INADDR_ANY)
+  servaddr.sin_addr.s_addr = htons(INADDR_ANY);
+
+  // Listen on port 22000 – htons(11000)
+  servaddr.sin_port = htons(22000);
+
+  // Prepare to listen for connections from address/port specified in sockaddr
+  bind(listen_fd, (struct sockaddr *) &servaddr, sizeof(servaddr));
+
+  // Start Listening for connections , keep at the most 10 connection requests waiting.
+  // If there are more than 10 computers wanting to connect at a time, the 11th one fails to.
+  
+  if(listen(listen_fd, 10) < 0) {
+        perror("server: listen"); 
+        exit(-1); 
+    }  
+
+
+  // Accept a connection from any device who is willing to connect, 
+  // If there is no one who wants to connect , wait. A file descriptor is returned. 
+  // This can finally be used to communicate , whatever is sent by the device accepted can be read from comm_fd, 
+  // whatever is written to comm_fd is sent to the other device.
+  comm_fd = accept(listen_fd, (struct sockaddr*) NULL, NULL);
+
+  while(1){
+    read(comm_fd,str,100);
+    if(comm_fd > 0){
+      if (strcmp(str,"quit\n\0") == 0){
+        printf("exiting\n");
+        shutdown(comm_fd, SHUT_WR);
+        close();
+        bzero(str, 100);
+        comm_fd = accept(listen_fd, (struct sockaddr*) NULL, NULL);
+      }
+      printf("Echoing back - %s \n",str);
+    } 
+    printf("%d\n",comm_fd);
+    bzero(str, 100);
+  }   
 
   char *filename          = argv[1];
   char action             = argv[2][0];

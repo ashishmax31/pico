@@ -1,0 +1,12 @@
+# temp folder 
+/temp
+
+# binaries
+/bin
+
+# Data blocks folder
+/storage
+
+# tags
+tags
+tags.*
